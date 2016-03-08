@@ -1,0 +1,17 @@
+**/*.log
+**/*.class
+**/.project
+**/.classpath
+**/*.iml
+**/*.springBeans
+
+**/bin/
+**/out/
+**/build/
+**/target/
+**/project/project/
+**/project/target/
+**/.metadata/
+**/.gradle/
+**/.settings/
+**/.idea/
