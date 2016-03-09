@@ -6,5 +6,5 @@ package rank.wurmup
 object SumOfArrApplication extends App{
   val arg1 = Console.in.readLine().toInt
   val arg2 = Console.in.readLine().split(" ")
-  println(arg2.map(BigInt(_)).reduce(_+_))
+  println(arg2.map(BigInt(_)).sum)
 }

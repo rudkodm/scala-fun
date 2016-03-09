@@ -2,8 +2,6 @@ package rank.tree;
 
 import rank.tree.model.Node;
 
-import java.util.LinkedList;
-
 public class LevelOrderPrint {
 
     java.util.LinkedList<java.util.LinkedList<Node>> layers = new java.util.LinkedList();
@@ -11,7 +9,7 @@ public class LevelOrderPrint {
     void LevelOrder(Node root) {
         if(root == null) return;
         traverce(root, 0);
-        for (LinkedList<Node> nodes : layers) {
+        for (java.util.LinkedList<Node> nodes : layers) {
             for (Node node : nodes) print(node);
         }
     }

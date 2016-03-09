@@ -10,15 +10,13 @@ import rank.tree.util.NodeUtil._
   */
 class HuffDecoTest extends FlatSpec with Matchers {
   /**
-    * <pre>{@code
-    *
+    * <pre>
     *         {ϕ,5}
     *      0 /    \ 1
     *    {ϕ,2}   {A,3}
     *   0/   \1
     * {B,1}  {C,1}
-    *
-    * }</pre>
+    * </pre>
     */
   val root: Node = H(0, 0, H(0, 0, H(1, 'B'), H(1, 'C')), H(3, 'A'));
   val code = "1001011"

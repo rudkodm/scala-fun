@@ -9,7 +9,6 @@ import rank.tree.util.NodeUtil._
   */
 class LcaSpeck extends FlatSpec with Matchers{
 
-
   "Lca" should "should return lowest common accessor" in {
     val actual = Lca.lca(root4, 1, 3)
     actual should equal(root4.left)

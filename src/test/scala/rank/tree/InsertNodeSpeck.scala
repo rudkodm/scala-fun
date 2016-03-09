@@ -11,27 +11,21 @@ class InsertNodeSpeck extends FlatSpec with Matchers{
 
   /**
     * <pre>
-    * {@code
-    *
     *        4
      *     /   \
      *    2     7
      *   / \
      *  1   3
-     * }
     * </pre>
     */
   var inicial: Node = N(4, N(2, N(1), N(3)), N(7))
   /**
     * <pre>
-    * {@code
-    *
     *        4
      *     /   \
      *    2     7
      *   / \   /
      *  1   3 6
-     * }
     * </pre>
     */
   var expected: Node = N(4, N(2, N(1), N(3)), N(7, N(6), null))

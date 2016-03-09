@@ -25,8 +25,6 @@ public class NodeUtil {
 
     /**
      * <pre>
-     * {@code
-     *
      *       3
      *     /   \
      *    5     2
@@ -34,49 +32,39 @@ public class NodeUtil {
      *  1   4 6   7
      *       \   /
      *        9 8
-     * }
      * </pre>
      */
     public static rank.tree.model.Node root1 = N(3, N(5, N(1, null, N(9)), N(4)), N(2, N(6), N(7, N(8), null)));
 
     /**
      * <pre>
-     * {@code
-     *
      *       3
      *     /   \
      *    5     2
      *   / \   /
      *  1   4 6
-     * }
      * </pre>
      */
     public static rank.tree.model.Node root2 = N(3, N(5, N(1), N(4)), N(2, N(6), null));
 
     /**
      * <pre>
-     * {@code
-     *
      *       3
      *     /   \
      *    5     2
      *   / \   / \
      *  1   4 6   7
-     * }
      * </pre>
      */
     public static rank.tree.model.Node root3 = N(3, N(5, N(1), N(4)), N(2, N(6, N(7), null), null));
 
     /**
      * <pre>
-     * {@code
-     *
      *       4
      *     /   \
      *    2     7
      *   / \   /
      *  1   3 6
-     * }
      * </pre>
      */
     public static rank.tree.model.Node root4 = N(4, N(2, N(1), N(3)), N(7, N(6), null));

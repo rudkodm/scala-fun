@@ -4,7 +4,6 @@ package rank.wurmup
   * Created by rudkodm on 3/5/16.
   */
 object DateApplication extends App{
-//  val in = "2:00:00PM"
   val in = Console.in.readLine()
   val time = in.dropRight(2).split(":").map(_.toInt)
   val pm = in.contains("PM")

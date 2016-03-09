@@ -11,7 +11,7 @@ object MatrixDiffApplication extends App{
     val row = Console.in.readLine().split(" ").map(_.toInt)
     for(j <- 0 to n) arr(i)(j) = row(j)
   }
-  val mainD = (0 to n).map(i => arr(i)(i)).reduce(_+_)
-  val secD = (0 to n).map(i => arr(i)(n-i)).reduce(_+_)
+  val mainD = (0 to n).map(i => arr(i)(i)).sum
+  val secD = (0 to n).map(i => arr(i)(n - i)).sum
   println(Math.abs(mainD-secD))
 }
