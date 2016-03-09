@@ -1,5 +1,7 @@
 package rank.tree
 
+import scala.collection.mutable
+
 /**
   * Created by rudkodm on 3/5/16.
   */
@@ -8,10 +10,13 @@ object TreeSwap extends App{
     override def hasNext: Boolean = ???
     override def next(): String = Console.in.readLine()
   }
-  new TreeBuilder().process(iterator)
+  new RootTreeBuilder(RootNode()).process(iterator)
 }
 
-class TreeBuilder(val tree:TreeNode = TreeNode(1)) {
+// ========================================
+
+class RootTreeBuilder(root: RootNode) {
+  val tree = root
 
   def process(commands: Iterator[String]) = {
 
@@ -33,19 +38,59 @@ class TreeBuilder(val tree:TreeNode = TreeNode(1)) {
     val swapNum = commands.next.toInt
     applyNext({ input =>
       val k = input.next.toInt
-      tree.swap(k)
+      tree.swapOnEach(k)
     }, swapNum)
   }
 }
 
-case class TreeNode(val data: Option[Int] = None, val left: Option[TreeNode] = None, val right: Option[TreeNode] = None) {
-  def add(node: TreeNode):TreeNode = {
-    print(node.data.getOrElse("N") + " ")
+// =============== MODEL ===================
+
+class RootNode() extends TreeNode(Some(1), None, None) {
+  val levelSetCache = mutable.Seq[Set[TreeNode]](Set(this))
+
+  def levelNodesSet(k:Int):Set[TreeNode] = {
+    if(k == 1) levelSetCache.head
+    if(levelSetCache.size < k) {
+      levelSetCache(k) = levelNodesSet(k-1).flatMap(node => node.child)
+      levelSetCache(k)
+    } else levelSetCache(k-1)
+  }
+
+  def add(node: TreeNode):RootNode = {
+    // TODO
+    Stream.from(1).takeWhile { i =>
+      val freeNodes = levelNodesSet(i).collect {
+        case tree @ TreeNode(_, _, _) if tree.child.size < 2 => true
+      }
+      true
+    }
     this
   }
 
-  def swap(k: Int):TreeNode = {
-    print(s"swap -> $k; ")
+  def swapOnEach(k: Int):TreeNode = {
+    this
+  }
+}
+object RootNode {
+  def apply() = new RootNode()
+  def apply(left: TreeNode, right: TreeNode) = {
+    val root = new RootNode()
+    root.left = Some(left)
+    root.right = Some(right)
+    root
+  }
+}
+
+// ===========================================
+
+case class TreeNode(val data: Option[Int] = None, var left: Option[TreeNode] = None, var right: Option[TreeNode] = None) {
+
+  def child:Seq[TreeNode] = left :: right :: Nil collect {case Some(x) => x}
+
+  def swap(): TreeNode = {
+    val tmp = left
+    left = right
+    right = tmp
     this
   }
 
@@ -60,3 +105,7 @@ object TreeNode {
     else new TreeNode(Some(data), None, None)
   }
 }
+
+
+
+

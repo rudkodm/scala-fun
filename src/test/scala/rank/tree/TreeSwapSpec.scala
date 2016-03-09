@@ -16,7 +16,7 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
   }
 
   "TreeBuilder" should "do nothing when '0' commands applied" in {
-    new TreeBuilder().process(
+    new RootTreeBuilder(RootNode()).process(
       """
         |0
         |0
@@ -24,8 +24,8 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
   }
 
   it should "add 2 Empty nodes when '-1 -1' command applied" in {
-    val tree: TreeNode = mock[TreeNode]
-    val builder = new TreeBuilder(tree)
+    val tree = mock[RootNode]
+    val builder = new RootTreeBuilder(tree)
     (tree.add _) expects TreeNode() returning tree twice
 
     builder.process(
@@ -37,8 +37,8 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
   }
 
   it should "add 1 Empty nodes and Node(2)" in {
-    val tree: TreeNode = mock[TreeNode]
-    val builder = new TreeBuilder(tree)
+    val tree = mock[RootNode]
+    val builder = new RootTreeBuilder(tree)
     inAnyOrder {
       (tree.add _) expects TreeNode() returning tree
       (tree.add _) expects TreeNode(2) returning tree
@@ -53,9 +53,9 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
   }
 
   it should "call swap method when 1 swap command in stack" in {
-    val tree: TreeNode = mock[TreeNode]
-    val builder = new TreeBuilder(tree)
-    (tree.swap _) expects 99 returning tree
+    val tree = mock[RootNode]
+    val builder = new RootTreeBuilder(tree)
+    (tree.swapOnEach _) expects 99 returning tree
 
     builder.process(
       """
@@ -66,11 +66,11 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
   }
 
   it should "call swap method 2 times when 2 swap command in stack" in {
-    val tree: TreeNode = mock[TreeNode]
-    val builder = new TreeBuilder(tree)
+    val tree = mock[RootNode]
+    val builder = new RootTreeBuilder(tree)
     inSequence {
-      (tree.swap _) expects 91 returning tree
-      (tree.swap _) expects 92 returning tree
+      (tree.swapOnEach _) expects 91 returning tree
+      (tree.swapOnEach _) expects 92 returning tree
     }
 
     builder.process(
@@ -83,10 +83,10 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
   }
 
   it should "throw Exception when Number of commands (Add + Swap) more than commands" in {
-    val tree: TreeNode = mock[TreeNode]
-    val builder = new TreeBuilder(tree)
+    val tree = mock[RootNode]
+    val builder = new RootTreeBuilder(tree)
     (tree.add _) expects * returning tree anyNumberOfTimes()
-    (tree.swap _) expects * returning tree anyNumberOfTimes()
+    (tree.swapOnEach _) expects * returning tree anyNumberOfTimes()
 
     intercept[Exception] {
       builder.process(
@@ -108,25 +108,33 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
       .toString should equal("3 2 4 1 5 7 6 8")
   }
 
+
+  it should "swap child nodes when method called" in {
+    val actual: TreeNode = TreeNode(1, TreeNode(2), TreeNode(3)).swap
+    val expected: TreeNode = TreeNode(1, TreeNode(3), TreeNode(2))
+    actual should equal (expected)
+  }
+
+  "RootNode" should "swap nodes on levels K*1..n , i.e when K is 3 then K*1=3, K*2=6, K*3=9 level's nodes should be swapped" in {
+    RootNode(
+        TreeNode(2),
+        TreeNode(3)
+    ).swapOnEach(1)
+      .toString should equal("3 1 2")
+
+    RootNode(
+        TreeNode(2, TreeNode(3), TreeNode(4)),
+        TreeNode(5, TreeNode(6), TreeNode(7))
+    ).swapOnEach(1)
+      .toString should equal("7 3 6 1 5 2 4")
+  }
+
   it should "add nodes to tree in '1st level -> 2nd level -> 3d ...' order." in {
-    TreeNode(1)
+    RootNode()
       .add(TreeNode(2)).add(TreeNode(3))
       .add(TreeNode(4)).add(TreeNode(5)).add(TreeNode(6)).add(TreeNode(7))
       .add(TreeNode(8))
       .toString should equal("8 4 2 5 1 3 7")
-  }
-
-  it should "swap K*1..n nodes, i.e when K is 3 then K*1=3, K*2=6, K*3=9 levels nodes should be swapped" in {
-    TreeNode(1)
-      .add(TreeNode(2)).add(TreeNode(3))
-      .swap(1)
-      .toString should equal("3 1 2")
-
-    TreeNode(1)
-      .add(TreeNode(2)).add(TreeNode(3))
-      .add(TreeNode(4)).add(TreeNode(5)).add(TreeNode(6)).add(TreeNode(7))
-      .swap(1)
-      .toString should equal("7 3 6 1 5 2 4")
   }
 }
 
