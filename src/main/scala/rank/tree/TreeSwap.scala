@@ -11,23 +11,23 @@ object TreeSwap extends App{
   new TreeBuilder().process(iterator)
 }
 
-class TreeBuilder(val tree:Node = Node(1)) {
+class TreeBuilder(val tree:TreeNode = TreeNode(1)) {
 
   def process(commands: Iterator[String]) = {
 
     def applyNext(f: (Iterator[String] => Unit), n: Int): Any = {
-      if (n == 0) return
-      else {
+      if (n != 0) {
         f(commands)
         applyNext(f, n - 1)
-      };
+      }
     }
 
     val nodesNum = commands.next.toInt
     applyNext({ input =>
       val args = input.next.split(" ").map(_.toInt)
-      tree.add(Node(args(0)))
-      tree.add(Node(args(1)))
+      tree
+        .add(TreeNode(args(0)))
+        .add(TreeNode(args(1)))
     }, nodesNum)
 
     val swapNum = commands.next.toInt
@@ -38,19 +38,25 @@ class TreeBuilder(val tree:Node = Node(1)) {
   }
 }
 
-case class Node(val data: Option[Int] = None, val left: Option[Node] = None, val right: Option[Node] = None) {
-  def add(node: Node) = print(node.data.getOrElse("N") + " ")
+case class TreeNode(val data: Option[Int] = None, val left: Option[TreeNode] = None, val right: Option[TreeNode] = None) {
+  def add(node: TreeNode):TreeNode = {
+    print(node.data.getOrElse("N") + " ")
+    this
+  }
 
-  def swap(k: Int) = print(s"swap -> $k; ")
+  def swap(k: Int):TreeNode = {
+    print(s"swap -> $k; ")
+    this
+  }
 
   override def toString: String = s"${left.fold("")(_.toString)} ${data.getOrElse("")} ${right.fold("")(_.toString)}".trim
 }
 
-object Node {
-  def apply(data: Int, left: Node, right: Node) = new Node(Some(data), Some(left), Some(right))
+object TreeNode {
+  def apply(data: Int, left: TreeNode, right: TreeNode) = new TreeNode(Some(data), Some(left), Some(right))
 
   def apply(data: Int) = {
-    if (data == -1) new Node()
-    else new Node(Some(data), None, None)
+    if (data == -1) new TreeNode()
+    else new TreeNode(Some(data), None, None)
   }
 }
