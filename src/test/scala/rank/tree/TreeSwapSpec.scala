@@ -123,8 +123,8 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
       .toString should equal("3 1 2")
 
     RootNode(
-        TreeNode(2, TreeNode(3), TreeNode(4)),
-        TreeNode(5, TreeNode(6), TreeNode(7))
+        TreeNode(2, TreeNode(4), TreeNode(5)),
+        TreeNode(3, TreeNode(6), TreeNode(7))
     ).swapOnEach(1)
       .toString should equal("7 3 6 1 5 2 4")
   }
@@ -134,7 +134,21 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
       .add(TreeNode(2)).add(TreeNode(3))
       .add(TreeNode(4)).add(TreeNode(5)).add(TreeNode(6)).add(TreeNode(7))
       .add(TreeNode(8))
-      .toString should equal("8 4 2 5 1 3 7")
+      .toString should equal("8 4 2 5 1 6 3 7")
+  }
+
+  it should "return Sets of nodes by level for levelNodesSet(k) method" in {
+    val root = RootNode(
+      TreeNode(2, TreeNode(3), TreeNode(4)),
+      TreeNode(5, TreeNode(6), new TreeNode(Some(7),
+        Some(TreeNode(8)),
+        None
+      ))
+    )
+    root.nodesOnLevel(1) should contain only TreeNode(1)
+    root.nodesOnLevel(2) should contain allOf (TreeNode(2), TreeNode(5))
+    root.nodesOnLevel(3) should contain allOf (TreeNode(3), TreeNode(4), TreeNode(6), TreeNode(7))
+    root.nodesOnLevel(4) should contain only TreeNode(8)
   }
 }
 

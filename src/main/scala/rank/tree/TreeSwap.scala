@@ -1,6 +1,6 @@
 package rank.tree
 
-import scala.collection.mutable
+
 
 /**
   * Created by rudkodm on 3/5/16.
@@ -46,28 +46,34 @@ class RootTreeBuilder(root: RootNode) {
 // =============== MODEL ===================
 
 class RootNode() extends TreeNode(Some(1), None, None) {
-  val levelSetCache = mutable.Seq[Set[TreeNode]](Set(this))
+  import scala.collection.mutable
 
-  def levelNodesSet(k:Int):Set[TreeNode] = {
-    if(k == 1) levelSetCache.head
-    if(levelSetCache.size < k) {
-      levelSetCache(k) = levelNodesSet(k-1).flatMap(node => node.child)
-      levelSetCache(k)
-    } else levelSetCache(k-1)
+  private val cache = mutable.ArrayBuffer[Set[TreeNode]](Set(), Set(this))
+  lazy val nodes = Stream.from(1).flatMap(nodesOnLevel)
+
+  def height: Int = {
+    def loop(t: TreeNode): Int = t match {
+      case TreeNode(None, _, _) => 1
+      case n@TreeNode(Some(_), _, _) => Seq(loop(n.left.getOrElse(TreeNode())), loop(n.right.getOrElse(TreeNode()))).max + 1
+      case _ => 0
+    }
+    loop(this) - 1
+  }
+
+  def nodesOnLevel(k:Int):Set[TreeNode] = {
+    if(k >= cache.size) cache += nodesOnLevel(k - 1).flatMap(node => node.children)
+    cache(k)
   }
 
   def add(node: TreeNode):RootNode = {
-    // TODO
-    Stream.from(1).takeWhile { i =>
-      val freeNodes = levelNodesSet(i).collect {
-        case tree @ TreeNode(_, _, _) if tree.child.size < 2 => true
-      }
-      true
-    }
+    val addTo = (to:TreeNode) => if(to.left.isEmpty) to.left = Some(node) else to.right = Some(node)
+    addTo(nodes.filter(_.hasEmptyChild).head)
     this
   }
 
   def swapOnEach(k: Int):TreeNode = {
+    val levels = (1 to height).map(_ * k)
+    levels.foreach {i => nodesOnLevel(i).foreach(_.swap)}
     this
   }
 }
@@ -85,15 +91,19 @@ object RootNode {
 
 case class TreeNode(val data: Option[Int] = None, var left: Option[TreeNode] = None, var right: Option[TreeNode] = None) {
 
-  def child:Seq[TreeNode] = left :: right :: Nil collect {case Some(x) => x}
+  def children:Seq[TreeNode] = left :: right :: Nil collect {case Some(x) => x}
 
-  def swap(): TreeNode = {
+  def hasEmptyChild = left.isEmpty || right.isEmpty
+
+  def swap = {
     val tmp = left
     left = right
     right = tmp
     this
   }
 
+  override def hashCode(): Int = this.data.hashCode()
+  override def equals(that: scala.Any): Boolean = that.isInstanceOf[TreeNode] && that.asInstanceOf[TreeNode].data == this.data
   override def toString: String = s"${left.fold("")(_.toString)} ${data.getOrElse("")} ${right.fold("")(_.toString)}".trim
 }
 
