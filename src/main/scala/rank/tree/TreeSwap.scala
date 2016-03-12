@@ -48,26 +48,27 @@ class RootTreeBuilder(root: RootNode) {
 class RootNode() extends TreeNode(Some(1), None, None) {
   import scala.collection.mutable
 
-  private val cache = mutable.ArrayBuffer[Set[TreeNode]](Set(), Set(this))
-  lazy val nodes = Stream.from(1).flatMap(nodesOnLevel)
+  private val cache = mutable.ArrayBuffer[Seq[TreeNode]](Seq(), Seq(this))
+  def nodesOnLevel(k:Int):Seq[TreeNode] = {
+    if(k >= cache.size) cache += nodesOnLevel(k - 1).flatMap(node => node.children)
+    cache(k)
+  }
+
+  def nodes:Seq[TreeNode] = Stream.from(1).flatMap(nodesOnLevel(_))
 
   def height: Int = {
     def loop(t: TreeNode): Int = t match {
       case TreeNode(None, _, _) => 1
-      case n@TreeNode(Some(_), _, _) => Seq(loop(n.left.getOrElse(TreeNode())), loop(n.right.getOrElse(TreeNode()))).max + 1
+      case n@TreeNode(Some(_), _, _) => Seq(loop(n.left.getOrElse(null)), loop(n.right.getOrElse(null))).max + 1
       case _ => 0
     }
     loop(this) - 1
   }
 
-  def nodesOnLevel(k:Int):Set[TreeNode] = {
-    if(k >= cache.size) cache += nodesOnLevel(k - 1).flatMap(node => node.children)
-    cache(k)
-  }
-
   def add(node: TreeNode):RootNode = {
     val addTo = (to:TreeNode) => if(to.left.isEmpty) to.left = Some(node) else to.right = Some(node)
-    addTo(nodes.filter(_.hasEmptyChild).head)
+    val filter: Seq[TreeNode] = nodes.filter(_.hasEmptyChild)
+    addTo(filter.head)
     this
   }
 
@@ -91,7 +92,7 @@ object RootNode {
 
 case class TreeNode(val data: Option[Int] = None, var left: Option[TreeNode] = None, var right: Option[TreeNode] = None) {
 
-  def children:Seq[TreeNode] = left :: right :: Nil collect {case Some(x) => x}
+  def children:Seq[TreeNode] = (left :: right :: Nil).flatten.collect {case n@TreeNode(Some(_), _, _) => n}
 
   def hasEmptyChild = left.isEmpty || right.isEmpty
 

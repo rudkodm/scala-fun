@@ -98,6 +98,53 @@ class TreeSwapSpec extends FlatSpec with MockFactory with MockMatchers with Test
     }
   }
 
+  it should "print right sequence for predefined commands set # 1" in {
+    val builder = new RootTreeBuilder(RootNode())
+    builder.process(
+      """
+        |5
+        |2 3
+        |-1 4
+        |-1 5
+        |-1 -1
+        |-1 -1
+        |1
+        |2
+      """)
+    builder.tree.toString should equal("4 2 1 5 3")
+  }
+
+
+  it should "print right sequence for predefined commands set # 2" in {
+    val builder = new RootTreeBuilder(RootNode())
+    builder.process(
+      """
+        |11
+        |2 3
+        |4 -1
+        |5 -1
+        |6 -1
+        |7 8
+        |-1 9
+        |-1 -1
+        |10 11
+        |-1 -1
+        |-1 -1
+        |-1 -1
+        |1
+        |2
+      """)
+    builder.tree.toString should equal("2 9 6 4 1 3 7 5 11 8 10")
+    builder.process(
+      """
+        |0
+        |1
+        |4
+      """
+    )
+    builder.tree.toString should equal("2 6 9 4 1 3 7 5 10 8 11")
+  }
+
   "Node" should "return string of data in nodes in internal order (left -> self -> right) when toString is called" in {
     TreeNode(1,
       TreeNode(2, TreeNode(3), TreeNode(4)),
